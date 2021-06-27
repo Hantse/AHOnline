@@ -48,7 +48,7 @@ namespace AHSync.Worker.Shared.Services
                 var realmCurrentAuctions = await clientWow.GetRealmAuctionsAsync(realmId, realmFaction, RegionHelper.Europe, NamespaceHelper.Dynamic, LocaleHelper.French);
 
                 var currentRealmCurrentAuctionIds = realmCurrentAuctions.Auctions.Select(s => (long)s.Id).ToList();
-                var itemsToDeleteIds = realmAuctions.Where(s => !currentRealmCurrentAuctionIds.Contains(s.AuctionId)).Select(s => s.AuctionId).ToArray();
+                var itemsToDeleteIds = realmAuctions.Select(s => s.AuctionId).Intersect(currentRealmCurrentAuctionIds).ToArray();
 
                 foreach (var item in realmCurrentAuctions.Auctions)
                 {

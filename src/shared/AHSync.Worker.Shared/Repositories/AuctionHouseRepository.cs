@@ -33,7 +33,9 @@ namespace AHSync.Worker.Shared.Repositories
 
         public override Task<int> DeletesAsync(Auction[] entities)
         {
-            return UpdatesAsync(entities);
+            var connection = connectionFactory.GetConnection();
+            var deletes = connection.BulkDelete(entities);
+            return Task.FromResult(deletes.Current.Count());
         }
 
         public override Task<Guid?> InsertAsync(Auction entity)
