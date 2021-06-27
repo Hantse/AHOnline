@@ -9,35 +9,8 @@ variables:
   tag: '$(Build.BuildId)'
 
 jobs:
-- job: BuildTests
-  displayName: Build & Tests
-  pool:
-    vmImage: 'windows-latest'
-  steps:
-  - task: UseDotNet@2
-    displayName: 'Install .NET Core SDK'
-    inputs:
-      version: 5.0.x
-      performMultiLevelLookup: true
-      includePreviewVersions: true # Required for preview versions
-
-  - task: NuGetCommand@2
-    displayName: Restore NuGet
-    inputs:
-      command: 'restore'
-      restoreSolution: '**/*.sln'
-      feedsToUse: 'select'
-
-  - task: DotNetCoreCLI@2
-    displayName: Build project
-    inputs:
-      command: 'build'
-      projects: '**/*.csproj'
-      arguments: '--configuration Release'
-
 - job: BuildImageService
   displayName: Build and publish docker image
-  dependsOn: BuildTests
   pool:
     vmImage: 'ubuntu-latest'
   steps:
