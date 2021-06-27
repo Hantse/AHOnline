@@ -33,7 +33,7 @@ namespace AHSync.Worker.Shared.Repositories
 
         public override Task<int> DeletesAsync(Auction[] entities)
         {
-            return CoreUpdatesAsync(SQL_DELETE_QUERY, entities);
+            return UpdatesAsync(entities);
         }
 
         public override Task<Guid?> InsertAsync(Auction entity)
