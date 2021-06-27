@@ -45,19 +45,20 @@ namespace AHSync.Worker.Shared.Services
                     RealmFaction = realmFaction
                 });
 
-                var dbIds = realmAuctions.Select(s => s.AuctionId).ToList();
                 var realmCurrentAuctions = await clientWow.GetRealmAuctionsAsync(realmId, realmFaction, RegionHelper.Europe, NamespaceHelper.Dynamic, LocaleHelper.French);
-                var itemsToDeleteIds = realmAuctions.Where(s => !dbIds.Contains(s.AuctionId)).Select(s => s.AuctionId).ToArray();
+
+                var currentRealmCurrentAuctionIds = realmCurrentAuctions.Auctions.Select(s => (long)s.Id).ToList();
+                var itemsToDeleteIds = realmAuctions.Where(s => !currentRealmCurrentAuctionIds.Contains(s.AuctionId)).Select(s => s.AuctionId).ToArray();
 
                 foreach (var item in realmCurrentAuctions.Auctions)
                 {
-                    if (realmAuctions.Any(a => a.AuctionId == item.Id))
+                    if (itemsToDeleteIds.Contains(item.Id))
                     {
                         var auctionItemToUpdate = realmAuctions.FirstOrDefault(a => a.AuctionId == item.Id);
                         MapUpdate(item, auctionItemToUpdate);
                         itemsToUpdate.Add(auctionItemToUpdate);
                     }
-                    else if (itemsToDeleteIds.Contains(item.Id))
+                    else if (realmAuctions.Any(a => a.AuctionId == item.Id))
                     {
                         var auctionItemToDelete = realmAuctions.FirstOrDefault(a => a.AuctionId == item.Id);
                         MapDelete(auctionItemToDelete);
