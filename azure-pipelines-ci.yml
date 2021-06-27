@@ -1,0 +1,55 @@
+name: AHOnlineWorker
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  tag: '$(Build.BuildId)'
+
+jobs:
+- job: BuildTests
+  displayName: Build & Tests
+  pool:
+    vmImage: 'windows-latest'
+  steps:
+  - task: UseDotNet@2
+    displayName: 'Install .NET Core SDK'
+    inputs:
+      version: 5.0.x
+      performMultiLevelLookup: true
+      includePreviewVersions: true # Required for preview versions
+
+  - task: NuGetCommand@2
+    displayName: Restore NuGet
+    inputs:
+      command: 'restore'
+      restoreSolution: '**/*.sln'
+      feedsToUse: 'select'
+
+  - task: DotNetCoreCLI@2
+    displayName: Build project
+    inputs:
+      command: 'build'
+      projects: '**/*.csproj'
+      arguments: '--configuration Release'
+
+- job: BuildImageService
+  displayName: Build and publish docker image
+  dependsOn: BuildTests
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: Docker@2
+    displayName: Build an Character Service Image
+    inputs:
+      containerRegistry: 'DockerHub'
+      repository: 'hantse/ahonlineworker'
+      command: 'buildAndPush'
+      Dockerfile: 'src/workers/AHSync.Worker/Dockerfile'
+      buildContext: '.'
+      tags: |
+        $(tag)
+        dev-$(tag)
+        dev
