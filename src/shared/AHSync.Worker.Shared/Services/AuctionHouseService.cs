@@ -76,6 +76,7 @@ namespace AHSync.Worker.Shared.Services
             catch (Exception e)
             {
                 logger.LogError(e, $"Error on processing realmId={realmId} - realmName={realmName} - realmFaction={realmFaction}");
+                throw;
             }
 
             sc.Stop();
