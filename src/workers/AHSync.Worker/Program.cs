@@ -34,13 +34,14 @@ namespace AHSync.Worker
             var builder = new ContainerBuilder();
             builder.RegisterType<SqlDbConnectionFactory>().As<IDatabaseConnectionFactory>().InstancePerDependency();
             builder.RegisterType<AuctionHouseRepository>().As<IAuctionHouseRepository>().InstancePerDependency();
+            builder.RegisterType<OperationHistoryRepository>().As<IOperationHistoryRepository>().InstancePerDependency();
             builder.RegisterType<WoWApiService>().As<IWoWApiService>().InstancePerDependency();
             builder.RegisterType<AuctionHouseService>().As<IAuctionHouseService>().InstancePerDependency();
             builder.Populate(services);
 
             var options = new BackgroundJobServerOptions
             {
-                Queues = new[] { "ah-sync" },
+                Queues = new[] { Environment.GetEnvironmentVariable("QueueName") },
                 WorkerCount = 1,
                 Activator = new AutofacJobActivator(builder.Build(), false)
             };

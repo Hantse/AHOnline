@@ -81,9 +81,11 @@ namespace AHSync.Worker.Tests
             wowApiServiceMock.Setup(s => s.GetRealmAuctionsAsync(It.IsAny<int>(), It.IsAny<int>()))
                                 .ReturnsAsync(() => mockData);
 
+            var operationHistoryRepositoryLoggerMock = new Mock<ILogger<OperationHistoryRepository>>().Object; ;
+            var operationHistoryRepositoryMock = new OperationHistoryRepository(dbConnectionFactory, operationHistoryRepositoryLoggerMock);
             var auctionRepositoryMock = new AuctionHouseRepository(dbConnectionFactory, logger);
             var auctionHouseServiceLoggerMock = new Mock<ILogger<AuctionHouseService>>().Object;
-            var auctionHouseService = new AuctionHouseService(auctionRepositoryMock, auctionHouseServiceLoggerMock, wowApiServiceMock.Object);
+            var auctionHouseService = new AuctionHouseService(auctionRepositoryMock, auctionHouseServiceLoggerMock, wowApiServiceMock.Object, operationHistoryRepositoryMock);
 
 
             var processResult = await auctionHouseService.TryProcessAsync(1, "TestRealm", 2);

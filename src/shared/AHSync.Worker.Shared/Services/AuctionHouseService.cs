@@ -13,14 +13,16 @@ namespace AHSync.Worker.Shared.Services
     public class AuctionHouseService : IAuctionHouseService
     {
         private readonly IAuctionHouseRepository auctionHouseRepository;
+        private readonly IOperationHistoryRepository operationHistoryRepository;
         private readonly IWoWApiService woWApiService;
         private readonly ILogger<AuctionHouseService> logger;
 
-        public AuctionHouseService(IAuctionHouseRepository auctionHouseRepository, ILogger<AuctionHouseService> logger, IWoWApiService woWApiService)
+        public AuctionHouseService(IAuctionHouseRepository auctionHouseRepository, ILogger<AuctionHouseService> logger, IWoWApiService woWApiService, IOperationHistoryRepository operationHistoryRepository)
         {
             this.auctionHouseRepository = auctionHouseRepository;
             this.logger = logger;
             this.woWApiService = woWApiService;
+            this.operationHistoryRepository = operationHistoryRepository;
         }
 
         [Hangfire.Queue("ah-sync")]
@@ -74,6 +76,19 @@ namespace AHSync.Worker.Shared.Services
 
             sc.Stop();
             logger.LogInformation($"Ending process at {DateTime.UtcNow} in {sc.ElapsedMilliseconds / 1000}");
+
+            _ = await operationHistoryRepository.InsertAsync(new OperationHistory()
+            {
+                CreateAt = DateTime.UtcNow,
+                CreateBy = "System Worker",
+                Duration = sc.ElapsedMilliseconds,
+                Id = Guid.NewGuid(),
+                RealmFaction = realmFaction,
+                RealmName = realmName,
+                Inserted = auctionsToInsert.Count,
+                Updated = auctionsToUpdate.Count,
+                Deleted = auctionsToDelete.Count
+            });
 
             return (true, auctionsToInsert.Count, auctionsToUpdate.Count, auctionsToDelete.Count);
         }

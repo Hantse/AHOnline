@@ -39,3 +39,20 @@ CREATE TABLE [ItemPriceHistory]
     UpdateAt DATETIME NULL,
     UpdateBy NVARCHAR(48) NULL
 );
+
+CREATE TABLE [OperationHistory]
+(
+	Id UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID() PRIMARY KEY,
+    [RealmName] NVARCHAR(120) NOT NULL,
+    [RealmFaction] INT NOT NULL,
+    Duration INT NOT NULL,
+    Inserted INT NOT NULL,
+    Deleted INT NOT NULL,
+    Updated INT NOT NULL,
+    CreateAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
+    CreateBy NVARCHAR(48) NOT NULL,
+    DeleteAt DATETIME NULL,
+    DeleteBy NVARCHAR(48) NULL,
+    UpdateAt DATETIME NULL,
+    UpdateBy NVARCHAR(48) NULL
+);

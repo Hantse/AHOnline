@@ -37,6 +37,7 @@ namespace AHSync.Dashboard
             builder.RegisterType<SqlDbConnectionFactory>().As<IDatabaseConnectionFactory>().InstancePerDependency();
             builder.RegisterType<WoWApiService>().As<IWoWApiService>().InstancePerDependency();
             builder.RegisterType<AuctionHouseRepository>().As<IAuctionHouseRepository>().InstancePerDependency();
+            builder.RegisterType<OperationHistoryRepository>().As<IOperationHistoryRepository>().InstancePerDependency();
             builder.RegisterType<AuctionHouseService>().As<IAuctionHouseService>().InstancePerDependency();
             builder.Populate(services);
 
