@@ -15,11 +15,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C2C93BED
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workers", "workers", "{5F0686F1-31CF-4239-80EC-407DFFB539E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AHSync.Worker", "src\workers\AHSync.Worker\AHSync.Worker.csproj", "{F7DB599B-C8E9-486C-AF8F-73790A5016FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AHSync.Worker", "src\workers\AHSync.Worker\AHSync.Worker.csproj", "{F7DB599B-C8E9-486C-AF8F-73790A5016FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AHSync.Dashboard", "src\workers\AHSync.Dashboard\AHSync.Dashboard.csproj", "{6F5591DA-49BA-4170-B8DC-5E13EC6146EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AHSync.Dashboard", "src\workers\AHSync.Dashboard\AHSync.Dashboard.csproj", "{6F5591DA-49BA-4170-B8DC-5E13EC6146EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Core", "src\shared\Infrastructure.Core\Infrastructure.Core.csproj", "{E4B14402-5EC8-4AA7-B8C4-FB59F21DF176}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure.Core", "src\shared\Infrastructure.Core\Infrastructure.Core.csproj", "{E4B14402-5EC8-4AA7-B8C4-FB59F21DF176}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{6644F9E8-4558-425A-AA88-4FCC582D6516}"
 EndProject
@@ -28,7 +28,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sql", "sql", "{9617829F-71E
 		deploy\sql\V1__Auctions__Table.sql = deploy\sql\V1__Auctions__Table.sql
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AHSync.Worker.Shared", "src\shared\AHSync.Worker.Shared\AHSync.Worker.Shared.csproj", "{FDEA5868-A8B1-4CC0-8612-066C8C9B08D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AHSync.Worker.Shared", "src\shared\AHSync.Worker.Shared\AHSync.Worker.Shared.csproj", "{FDEA5868-A8B1-4CC0-8612-066C8C9B08D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AHSync.Worker.Tests", "tests\AHSync.Worker.Tests\AHSync.Worker.Tests.csproj", "{DAB0E843-7412-4BE4-A261-B1C691A10AA2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -88,6 +90,18 @@ Global
 		{FDEA5868-A8B1-4CC0-8612-066C8C9B08D6}.Release|x64.Build.0 = Release|Any CPU
 		{FDEA5868-A8B1-4CC0-8612-066C8C9B08D6}.Release|x86.ActiveCfg = Release|Any CPU
 		{FDEA5868-A8B1-4CC0-8612-066C8C9B08D6}.Release|x86.Build.0 = Release|Any CPU
+		{DAB0E843-7412-4BE4-A261-B1C691A10AA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAB0E843-7412-4BE4-A261-B1C691A10AA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAB0E843-7412-4BE4-A261-B1C691A10AA2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DAB0E843-7412-4BE4-A261-B1C691A10AA2}.Debug|x64.Build.0 = Debug|Any CPU
+		{DAB0E843-7412-4BE4-A261-B1C691A10AA2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DAB0E843-7412-4BE4-A261-B1C691A10AA2}.Debug|x86.Build.0 = Debug|Any CPU
+		{DAB0E843-7412-4BE4-A261-B1C691A10AA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAB0E843-7412-4BE4-A261-B1C691A10AA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAB0E843-7412-4BE4-A261-B1C691A10AA2}.Release|x64.ActiveCfg = Release|Any CPU
+		{DAB0E843-7412-4BE4-A261-B1C691A10AA2}.Release|x64.Build.0 = Release|Any CPU
+		{DAB0E843-7412-4BE4-A261-B1C691A10AA2}.Release|x86.ActiveCfg = Release|Any CPU
+		{DAB0E843-7412-4BE4-A261-B1C691A10AA2}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,6 +116,7 @@ Global
 		{E4B14402-5EC8-4AA7-B8C4-FB59F21DF176} = {52ACAEEF-957C-4A01-9E19-5B270ADE9D9D}
 		{9617829F-71ED-4455-85B3-943E839E7D8D} = {6644F9E8-4558-425A-AA88-4FCC582D6516}
 		{FDEA5868-A8B1-4CC0-8612-066C8C9B08D6} = {5F0686F1-31CF-4239-80EC-407DFFB539E8}
+		{DAB0E843-7412-4BE4-A261-B1C691A10AA2} = {C2C93BED-9D83-4769-ACCC-503BF58B73BD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E4AE7D19-4F37-411B-A66E-D9AD55962F91}

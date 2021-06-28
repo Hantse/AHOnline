@@ -1,6 +1,4 @@
 ﻿using AHSync.Worker.Shared.Interfaces;
-using Blizzard.WoWClassic.ApiClient;
-using Blizzard.WoWClassic.ApiClient.Helpers;
 using Infrastructure.Core.Entities;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,19 +9,27 @@ using System.Threading.Tasks;
 
 namespace AHSync.Worker.Shared.Services
 {
+    [Hangfire.Queue("ah-sync")]
     public class AuctionHouseService : IAuctionHouseService
     {
         private readonly IAuctionHouseRepository auctionHouseRepository;
+        private readonly IWoWApiService woWApiService;
         private readonly ILogger<AuctionHouseService> logger;
 
-        public AuctionHouseService(IAuctionHouseRepository auctionHouseRepository, ILogger<AuctionHouseService> logger)
+        public AuctionHouseService(IAuctionHouseRepository auctionHouseRepository, ILogger<AuctionHouseService> logger, IWoWApiService woWApiService)
         {
             this.auctionHouseRepository = auctionHouseRepository;
             this.logger = logger;
+            this.woWApiService = woWApiService;
         }
 
-        public async Task<bool> TryProcessAsync(int realmId, string realmName, int realmFaction)
+        [Hangfire.Queue("ah-sync")]
+        public async Task<(bool success, int insertResult, int updateResult, int deleteResult)> TryProcessAsync(int realmId, string realmName, int realmFaction)
         {
+            var auctionsToInsert = new List<Auction>();
+            var auctionsToUpdate = new List<Auction>();
+            var auctionsToDelete = new List<Auction>();
+
             Stopwatch sc = new Stopwatch();
             sc.Start();
 
@@ -32,46 +38,33 @@ namespace AHSync.Worker.Shared.Services
 
             try
             {
-                var clientWow = new WoWClassicApiClient("bxSvhNNHJwI0kgNvKy6Z91oMEOpwgjmv", "2b136112d3064b11b19c5ea275846996");
-                clientWow.SetDefaultValues(RegionHelper.Europe, NamespaceHelper.Dynamic, LocaleHelper.French);
-
-                var itemsToInsert = new List<Auction>();
-                var itemsToUpdate = new List<Auction>();
-                var itemsToDelete = new List<Auction>();
-
                 var realmAuctions = await auctionHouseRepository.QueryMultipleAsync(new Auction()
                 {
                     RealmName = realmName,
                     RealmFaction = realmFaction
                 });
 
-                var realmCurrentAuctions = await clientWow.GetRealmAuctionsAsync(realmId, realmFaction, RegionHelper.Europe, NamespaceHelper.Dynamic, LocaleHelper.French);
+                var realmCurrentAuctions = await woWApiService.GetRealmAuctionsAsync(realmId, realmFaction);
 
                 var currentRealmCurrentAuctionIds = realmCurrentAuctions.Auctions.Select(s => (long)s.Id).ToList();
-                var itemsToDeleteIds = realmAuctions.Select(s => s.AuctionId).Intersect(currentRealmCurrentAuctionIds).ToArray();
+                auctionsToDelete = realmAuctions.Where(i => !currentRealmCurrentAuctionIds.Contains(i.AuctionId)).ToList();
 
-                foreach (var item in realmCurrentAuctions.Auctions)
+                foreach (var auction in realmCurrentAuctions.Auctions)
                 {
-                    if (itemsToDeleteIds.Contains(item.Id))
+                    if (realmAuctions.Any(a => a.AuctionId == auction.Id))
                     {
-                        var auctionItemToUpdate = realmAuctions.FirstOrDefault(a => a.AuctionId == item.Id);
-                        MapUpdate(item, auctionItemToUpdate);
-                        itemsToUpdate.Add(auctionItemToUpdate);
-                    }
-                    else if (realmAuctions.Any(a => a.AuctionId == item.Id))
-                    {
-                        var auctionItemToDelete = realmAuctions.FirstOrDefault(a => a.AuctionId == item.Id);
-                        MapDelete(auctionItemToDelete);
-                        itemsToDelete.Add(auctionItemToDelete);
+                        var auctionItemToUpdate = realmAuctions.FirstOrDefault(a => a.AuctionId == auction.Id);
+                        MapUpdate(auction, auctionItemToUpdate);
+                        auctionsToUpdate.Add(auctionItemToUpdate);
                     }
                     else
                     {
-                        Auction auctionItemToInsert = MapNewItem(realmName, realmFaction, item);
-                        itemsToInsert.Add(auctionItemToInsert);
+                        Auction auctionItemToInsert = MapNewItem(realmName, realmFaction, auction);
+                        auctionsToInsert.Add(auctionItemToInsert);
                     }
                 }
 
-                await ProcessDatabaseTransactions(itemsToInsert, itemsToUpdate, itemsToDelete);
+                await ProcessDatabaseTransactions(auctionsToInsert, auctionsToUpdate, auctionsToDelete);
             }
             catch (Exception e)
             {
@@ -82,7 +75,7 @@ namespace AHSync.Worker.Shared.Services
             sc.Stop();
             logger.LogInformation($"Ending process at {DateTime.UtcNow} in {sc.ElapsedMilliseconds / 1000}");
 
-            return true;
+            return (true, auctionsToInsert.Count, auctionsToUpdate.Count, auctionsToDelete.Count);
         }
 
         private async Task ProcessDatabaseTransactions(List<Auction> itemsToInsert, List<Auction> itemsToUpdate, List<Auction> itemsToDelete)
@@ -116,12 +109,6 @@ namespace AHSync.Worker.Shared.Services
                 CreateAt = DateTime.UtcNow,
                 CreateBy = "Worker"
             };
-        }
-
-        private static void MapDelete(Auction auctionItemToDelete)
-        {
-            auctionItemToDelete.DeleteAt = DateTime.UtcNow;
-            auctionItemToDelete.DeleteBy = "Worker";
         }
 
         private static void MapUpdate(Blizzard.WoWClassic.ApiClient.Contracts.Auction item, Auction auctionItemToUpdate)
