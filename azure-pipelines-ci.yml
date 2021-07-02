@@ -9,7 +9,7 @@ variables:
   tag: '$(Build.BuildId)'
 
 jobs:
-- job: BuildImageService
+- job: BuildWorkerImageService
   displayName: Build and publish docker image
   pool:
     vmImage: 'ubuntu-latest'
@@ -27,7 +27,7 @@ jobs:
         dev-$(tag)
         dev
 
-- job: BuildImageService
+- job: BuildDashboardImageService
   displayName: Build and publish docker image
   pool:
     vmImage: 'ubuntu-latest'
@@ -45,7 +45,7 @@ jobs:
         dev-$(tag)
         dev
 
-- job: BuildImageService
+- job: BuildAdminServiceImageService
   displayName: Build and publish docker image
   pool:
     vmImage: 'ubuntu-latest'
