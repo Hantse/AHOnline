@@ -29,6 +29,14 @@ namespace Service.Admin
             services.AddScoped<ITransactionHistoryBusiness, TransactionHistoryBusiness>();
             services.AddScoped<IDatabaseConnectionFactory, SqlDbConnectionFactory>();
             services.AddScoped<IOperationHistoryRepository, OperationHistoryRepository>();
+
+            services.AddCors(cors =>
+            {
+                cors.AddDefaultPolicy(policy =>
+                {
+                    policy.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin();
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,7 +55,7 @@ namespace Service.Admin
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            app.UseCors();
             app.UseRouting();
 
             app.UseAuthorization();
