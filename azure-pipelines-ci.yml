@@ -26,3 +26,39 @@ jobs:
         $(tag)
         dev-$(tag)
         dev
+
+- job: BuildImageService
+  displayName: Build and publish docker image
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: Docker@2
+    displayName: Build an AH Online Dashboard Image
+    inputs:
+      containerRegistry: 'DockerHub'
+      repository: 'hantse/ahonlinedashboard'
+      command: 'buildAndPush'
+      Dockerfile: 'src/workers/AHSync.Dashboard/Dockerfile'
+      buildContext: '.'
+      tags: |
+        $(tag)
+        dev-$(tag)
+        dev
+
+- job: BuildImageService
+  displayName: Build and publish docker image
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: Docker@2
+    displayName: Build an AH Online Admin Service Image
+    inputs:
+      containerRegistry: 'DockerHub'
+      repository: 'hantse/ahonlineadminservice'
+      command: 'buildAndPush'
+      Dockerfile: 'src/services/Service.Admin/Dockerfile'
+      buildContext: '.'
+      tags: |
+        $(tag)
+        dev-$(tag)
+        dev                

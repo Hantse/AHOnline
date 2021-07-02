@@ -79,7 +79,7 @@ namespace AHSync.Dashboard
             clientWow.SetDefaultValues(RegionHelper.Europe, NamespaceHelper.Dynamic, LocaleHelper.French);
 
             var realms = await clientWow.GetConnectedRealmsAsync();
-            foreach (var realm in realms.ConnectedRealms.Take(2))
+            foreach (var realm in realms.ConnectedRealms)
             {
                 var realmId = int.Parse(realm.Href.Replace("https://eu.api.blizzard.com/data/wow/connected-realm/", "")
                                         .Replace("?namespace=dynamic-classic-eu", ""));
