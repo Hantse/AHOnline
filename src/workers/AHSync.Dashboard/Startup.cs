@@ -6,6 +6,7 @@ using Autofac.Extensions.DependencyInjection;
 using Blizzard.WoWClassic.ApiClient;
 using Blizzard.WoWClassic.ApiClient.Helpers;
 using Hangfire;
+using Hangfire.Dashboard;
 using Infrastructure.Core.Interfaces;
 using Infrastructure.Core.Persistence;
 using Microsoft.AspNetCore.Builder;
@@ -67,7 +68,11 @@ namespace AHSync.Dashboard
                 app.UseHsts();
             }
 
-            app.UseHangfireDashboard("");
+            app.UseHangfireDashboard("", new DashboardOptions()
+            {
+                Authorization = new[] { new DashboardNoAuthorizationFilter() }
+            });
+
             app.UseHttpsRedirection();
 
             InitJobs();
@@ -90,6 +95,14 @@ namespace AHSync.Dashboard
                 RecurringJob.AddOrUpdate<IAuctionHouseService>($"{realmName}-ally", (auctionHouseService) => auctionHouseService.TryProcessAsync(realmId, realmName, 2), "*/30 * * * *", TimeZoneInfo.Utc);
                 RecurringJob.AddOrUpdate<IAuctionHouseService>($"{realmName}-horde", (auctionHouseService) => auctionHouseService.TryProcessAsync(realmId, realmName, 6), "*/30 * * * *", TimeZoneInfo.Utc);
             }
+        }
+    }
+
+    public class DashboardNoAuthorizationFilter : IDashboardAuthorizationFilter
+    {
+        public bool Authorize(DashboardContext dashboardContext)
+        {
+            return true;
         }
     }
 }
