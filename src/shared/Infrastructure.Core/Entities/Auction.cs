@@ -1,10 +1,13 @@
-﻿using Infrastructure.Core.Persistence;
+﻿using Dapper.Contrib.Extensions;
+using Infrastructure.Core.Persistence;
 using System;
 
 namespace Infrastructure.Core.Entities
 {
     public class Auction : CoreEntity
     {
+        [Key]
+        public long Id { get; set; }
         public long AuctionId { get; set; }
         public string RealmName { get; set; }
         public int RealmFaction { get; set; }

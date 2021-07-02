@@ -5,10 +5,6 @@ namespace Infrastructure.Core.Persistence
 {
     public class CoreEntity
     {
-        [System.ComponentModel.DataAnnotations.Key]
-        [JsonPropertyName("id")]
-        public Guid Id { get; set; }
-
         [JsonPropertyName("createAt")]
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 

@@ -1,4 +1,5 @@
-﻿using AHSync.Worker.Shared.Interfaces;
+﻿using AHSync.Worker.Shared.Filters;
+using AHSync.Worker.Shared.Interfaces;
 using AHSync.Worker.Shared.Repositories;
 using AHSync.Worker.Shared.Services;
 using Autofac;

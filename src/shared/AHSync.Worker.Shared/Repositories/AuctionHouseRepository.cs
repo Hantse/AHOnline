@@ -14,7 +14,7 @@ namespace AHSync.Worker.Shared.Repositories
 {
     public class AuctionHouseRepository : CoreRepository<Auction>, IAuctionHouseRepository
     {
-        public string SQL_SELECT_REALM_AND_FACTION_QUERY = "SELECT Id, AuctionId, [RealmName], [RealmFaction], [ItemName], [ItemId], [ItemRand], [ItemSeed], [Bid], [Buyout], [Quantity], [TimeLeft], CreateAt, CreateBy, UpdateAt, UpdateBy FROM Auction WHERE RealmName = @RealmName AND RealmFaction = @RealmFaction AND DeleteAt IS NULL;";
+        public string SQL_SELECT_REALM_AND_FACTION_QUERY = "SELECT AuctionId, [RealmName], [RealmFaction], [ItemName], [ItemId], [ItemRand], [ItemSeed], [Bid], [Buyout], [Quantity], [TimeLeft], CreateAt, CreateBy, UpdateAt, UpdateBy FROM Auction WHERE RealmName = @RealmName AND RealmFaction = @RealmFaction AND DeleteAt IS NULL;";
         public string SQL_SELECT_ONE_BY_ID = "SELECT TOP(1) * FROM Auction WHERE AuctionId = @AuctionId;";
         public string SQL_INSERT_QUERY = "INSERT INTO Auction(AuctionId, RealmName, RealmFaction, ItemName, ItemId, ItemRand, ItemSeed, Bid, Buyout, Quantity, TimeLeft, CreateAt, CreateBy) " +
                                             "VALUES(@AuctionId, @RealmName, @RealmFaction, @ItemName, @ItemId, @ItemRand, @ItemSeed, @Bid, @Buyout, @Quantity, @TimeLeft, @CreateAt, @CreateBy);";

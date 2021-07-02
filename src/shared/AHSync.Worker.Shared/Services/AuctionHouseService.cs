@@ -1,4 +1,5 @@
-﻿using AHSync.Worker.Shared.Interfaces;
+﻿using AHSync.Worker.Shared.Filters;
+using AHSync.Worker.Shared.Interfaces;
 using Infrastructure.Core.Entities;
 using Microsoft.Extensions.Logging;
 using System;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 namespace AHSync.Worker.Shared.Services
 {
     [Hangfire.Queue("ah-sync")]
+    [RetryFilter]
     public class AuctionHouseService : IAuctionHouseService
     {
         private readonly IAuctionHouseRepository auctionHouseRepository;
@@ -26,6 +28,7 @@ namespace AHSync.Worker.Shared.Services
         }
 
         [Hangfire.Queue("ah-sync")]
+        [RetryFilter]
         public async Task<(bool success, int insertResult, int updateResult, int deleteResult)> TryProcessAsync(int realmId, string realmName, int realmFaction)
         {
             var auctionsToInsert = new List<Auction>();
@@ -75,7 +78,7 @@ namespace AHSync.Worker.Shared.Services
             }
 
             sc.Stop();
-            logger.LogInformation($"Ending process at {DateTime.UtcNow} in {sc.ElapsedMilliseconds / 1000}");
+            logger.LogInformation($"Ending process at {DateTime.UtcNow} in {sc.ElapsedMilliseconds} ms");
 
             _ = await operationHistoryRepository.InsertAsync(new OperationHistory()
             {
@@ -95,21 +98,41 @@ namespace AHSync.Worker.Shared.Services
 
         private async Task ProcessDatabaseTransactions(List<Auction> itemsToInsert, List<Auction> itemsToUpdate, List<Auction> itemsToDelete)
         {
-            logger.LogInformation($"Item to insert => {itemsToInsert.Count}");
-            _ = await auctionHouseRepository.InsertsAsync(itemsToInsert.ToArray());
+            try
+            {
+                logger.LogInformation($"Item to insert => {itemsToInsert.Count}");
+                _ = await auctionHouseRepository.InsertsAsync(itemsToInsert.ToArray());
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error on insert ...");
+            }
 
-            logger.LogInformation($"Item to update => {itemsToUpdate.Count}");
-            _ = await auctionHouseRepository.UpdatesAsync(itemsToUpdate.ToArray());
+            try
+            {
+                logger.LogInformation($"Item to update => {itemsToUpdate.Count}");
+                _ = await auctionHouseRepository.UpdatesAsync(itemsToUpdate.ToArray());
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error on update ...");
+            }
 
-            logger.LogInformation($"Item to delete => {itemsToDelete.Count()}");
-            _ = await auctionHouseRepository.DeletesAsync(itemsToDelete.ToArray());
+            try
+            {
+                logger.LogInformation($"Item to delete => {itemsToDelete.Count()}");
+                _ = await auctionHouseRepository.DeletesAsync(itemsToDelete.ToArray());
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error on delete ...");
+            }
         }
 
         private static Auction MapNewItem(string realmName, int realmFaction, Blizzard.WoWClassic.ApiClient.Contracts.Auction item)
         {
             return new Auction()
             {
-                Id = Guid.NewGuid(),
                 AuctionId = item.Id,
                 ItemName = "ToDo",
                 ItemId = item.Item.Id,

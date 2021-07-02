@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AHSync.Dashboard
@@ -49,6 +50,7 @@ namespace AHSync.Dashboard
                 options.WorkerCount = 1;
                 options.ServerTimeout = TimeSpan.FromMinutes(1);
                 options.Activator = new AutofacJobActivator(builder.Build(), false);
+                options.Queues = new string[] { "admin", "system", "ah-sync" };
             });
 
         }
@@ -77,7 +79,7 @@ namespace AHSync.Dashboard
             clientWow.SetDefaultValues(RegionHelper.Europe, NamespaceHelper.Dynamic, LocaleHelper.French);
 
             var realms = await clientWow.GetConnectedRealmsAsync();
-            foreach (var realm in realms.ConnectedRealms)
+            foreach (var realm in realms.ConnectedRealms.Take(2))
             {
                 var realmId = int.Parse(realm.Href.Replace("https://eu.api.blizzard.com/data/wow/connected-realm/", "")
                                         .Replace("?namespace=dynamic-classic-eu", ""));
@@ -85,8 +87,8 @@ namespace AHSync.Dashboard
                 var realmInformations = await clientWow.GetConnectedRealmAsync(realmId);
                 var realmName = realmInformations.RealmDetails[0].Name;
 
-                RecurringJob.AddOrUpdate<IAuctionHouseService>($"{realmName}-ally", (auctionHouseService) => auctionHouseService.TryProcessAsync(realmId, realmName, 2), "*/15 * * * *", TimeZoneInfo.Utc, queue: "ah-sync");
-                RecurringJob.AddOrUpdate<IAuctionHouseService>($"{realmName}-horde", (auctionHouseService) => auctionHouseService.TryProcessAsync(realmId, realmName, 6), "*/15 * * * *", TimeZoneInfo.Utc, queue: "ah-sync");
+                RecurringJob.AddOrUpdate<IAuctionHouseService>($"{realmName}-ally", (auctionHouseService) => auctionHouseService.TryProcessAsync(realmId, realmName, 2), "*/30 * * * *", TimeZoneInfo.Utc, queue: "ah-sync");
+                RecurringJob.AddOrUpdate<IAuctionHouseService>($"{realmName}-horde", (auctionHouseService) => auctionHouseService.TryProcessAsync(realmId, realmName, 6), "*/30 * * * *", TimeZoneInfo.Utc, queue: "ah-sync");
             }
         }
     }
