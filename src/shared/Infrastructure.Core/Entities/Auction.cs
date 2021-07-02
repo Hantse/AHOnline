@@ -1,6 +1,5 @@
 ﻿using Dapper.Contrib.Extensions;
 using Infrastructure.Core.Persistence;
-using System;
 
 namespace Infrastructure.Core.Entities
 {
