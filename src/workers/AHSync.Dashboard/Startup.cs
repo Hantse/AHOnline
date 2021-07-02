@@ -50,7 +50,7 @@ namespace AHSync.Dashboard
                 options.WorkerCount = 1;
                 options.ServerTimeout = TimeSpan.FromMinutes(1);
                 options.Activator = new AutofacJobActivator(builder.Build(), false);
-                options.Queues = new string[] { "admin", "system", "ah-sync" };
+                options.Queues = new string[] { "admin", "system" };
             });
 
         }
@@ -87,8 +87,8 @@ namespace AHSync.Dashboard
                 var realmInformations = await clientWow.GetConnectedRealmAsync(realmId);
                 var realmName = realmInformations.RealmDetails[0].Name;
 
-                RecurringJob.AddOrUpdate<IAuctionHouseService>($"{realmName}-ally", (auctionHouseService) => auctionHouseService.TryProcessAsync(realmId, realmName, 2), "*/30 * * * *", TimeZoneInfo.Utc, queue: "ah-sync");
-                RecurringJob.AddOrUpdate<IAuctionHouseService>($"{realmName}-horde", (auctionHouseService) => auctionHouseService.TryProcessAsync(realmId, realmName, 6), "*/30 * * * *", TimeZoneInfo.Utc, queue: "ah-sync");
+                RecurringJob.AddOrUpdate<IAuctionHouseService>($"{realmName}-ally", (auctionHouseService) => auctionHouseService.TryProcessAsync(realmId, realmName, 2), "*/30 * * * *", TimeZoneInfo.Utc);
+                RecurringJob.AddOrUpdate<IAuctionHouseService>($"{realmName}-horde", (auctionHouseService) => auctionHouseService.TryProcessAsync(realmId, realmName, 6), "*/30 * * * *", TimeZoneInfo.Utc);
             }
         }
     }
