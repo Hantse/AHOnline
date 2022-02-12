@@ -1,11 +1,13 @@
 ﻿using AHSync.Worker.Shared.Filters;
 using AHSync.Worker.Shared.Interfaces;
+using Blizzard.WoWClassic.ApiContract.Items;
 using Infrastructure.Core.Entities;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace AHSync.Worker.Shared.Services
@@ -15,16 +17,20 @@ namespace AHSync.Worker.Shared.Services
     public class AuctionHouseService : IAuctionHouseService
     {
         private readonly IAuctionHouseRepository auctionHouseRepository;
+        private readonly IItemRepository itemRepository;
         private readonly IOperationHistoryRepository operationHistoryRepository;
         private readonly IWoWApiService woWApiService;
         private readonly ILogger<AuctionHouseService> logger;
 
-        public AuctionHouseService(IAuctionHouseRepository auctionHouseRepository, ILogger<AuctionHouseService> logger, IWoWApiService woWApiService, IOperationHistoryRepository operationHistoryRepository)
+        private static IEnumerable<Item> items = new List<Item>();
+
+        public AuctionHouseService(IAuctionHouseRepository auctionHouseRepository, ILogger<AuctionHouseService> logger, IWoWApiService woWApiService, IOperationHistoryRepository operationHistoryRepository, IItemRepository itemRepository)
         {
             this.auctionHouseRepository = auctionHouseRepository;
             this.logger = logger;
             this.woWApiService = woWApiService;
             this.operationHistoryRepository = operationHistoryRepository;
+            this.itemRepository = itemRepository;
         }
 
         [Hangfire.Queue("ah-sync")]
@@ -40,6 +46,8 @@ namespace AHSync.Worker.Shared.Services
 
             logger.LogInformation($"Data receive : realmId={realmId} - realmName={realmName} - realmFaction={realmFaction}");
             logger.LogInformation($"Start process at {DateTime.UtcNow}");
+
+            items = await itemRepository.QueryMultipleAsync(new Item());
 
             try
             {
@@ -60,12 +68,14 @@ namespace AHSync.Worker.Shared.Services
                     {
                         var auctionItemToUpdate = realmAuctions.FirstOrDefault(a => a.AuctionId == auction.Id);
                         MapUpdate(auction, auctionItemToUpdate);
-                        auctionsToUpdate.Add(auctionItemToUpdate);
+                        if (auctionItemToUpdate != null)
+                            auctionsToUpdate.Add(auctionItemToUpdate);
                     }
                     else
                     {
                         Auction auctionItemToInsert = MapNewItem(realmName, realmFaction, auction);
-                        auctionsToInsert.Add(auctionItemToInsert);
+                        if (auctionItemToInsert != null)
+                            auctionsToInsert.Add(auctionItemToInsert);
                     }
                 }
 
@@ -131,15 +141,27 @@ namespace AHSync.Worker.Shared.Services
 
         private static Auction MapNewItem(string realmName, int realmFaction, Blizzard.WoWClassic.ApiClient.Contracts.Auction item)
         {
+            var dbItem = items.FirstOrDefault(f => f.ItemId == item.Item.Id);
+            if (dbItem == null)
+                return null;
+
+            var itemDetails = JsonSerializer.Deserialize<ItemDetails>(dbItem.Value);
+
             return new Auction()
             {
                 AuctionId = item.Id,
-                ItemName = "ToDo",
+                ItemName = dbItem.NameEnUs,
+                ItemNameFr = dbItem.NameFrFr,
+                ItemClass = dbItem.ItemClass,
+                ItemSubclass = dbItem.ItemSubClass,
                 ItemId = item.Item.Id,
                 ItemRand = item.Item.Rand,
                 ItemSeed = item.Item.Seed,
                 Quantity = item.Quantity,
                 TimeLeft = item.TimeLeft,
+                Quality = dbItem.Quality,
+                InventoryType = itemDetails?.PreviewItem?.InventoryType?.Name?.EnUs,
+                Level = itemDetails.RequiredLevel,
                 Bid = item.Bid,
                 Buyout = item.Buyout,
                 RealmFaction = realmFaction,
@@ -151,12 +173,21 @@ namespace AHSync.Worker.Shared.Services
 
         private static void MapUpdate(Blizzard.WoWClassic.ApiClient.Contracts.Auction item, Auction auctionItemToUpdate)
         {
-            auctionItemToUpdate.UpdateAt = DateTime.UtcNow;
-            auctionItemToUpdate.UpdateBy = "Worker";
-            auctionItemToUpdate.Quantity = item.Quantity;
-            auctionItemToUpdate.TimeLeft = item.TimeLeft;
-            auctionItemToUpdate.Bid = item.Bid;
-            auctionItemToUpdate.Buyout = item.Buyout;
+            var dbItem = items.FirstOrDefault(f => f.ItemId == item.Item.Id);
+            if (dbItem == null)
+            {
+                auctionItemToUpdate = null;
+            }
+            else
+            {
+                var itemDetails = JsonSerializer.Deserialize<ItemDetails>(dbItem.Value);
+                auctionItemToUpdate.UpdateAt = DateTime.UtcNow;
+                auctionItemToUpdate.UpdateBy = "Worker";
+                auctionItemToUpdate.Quantity = item.Quantity;
+                auctionItemToUpdate.TimeLeft = item.TimeLeft;
+                auctionItemToUpdate.Bid = item.Bid;
+                auctionItemToUpdate.Buyout = item.Buyout;
+            }
         }
     }
 }

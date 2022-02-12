@@ -1,0 +1,78 @@
+body {
+    min-width: 1600px !important;
+}
+
+--mud-palette-primary {
+    background-color: #333b4d !important;
+    border: 1px solid #333b4d !important;
+}
+
+--mud-palette-text-secondary {
+    color: #FFF !important;
+}
+
+.hero h1 {
+    margin-top: 60px !important;
+    margin-bottom: 30px !important;
+    border: none;
+    font-family: Cuprum !important;
+}
+
+body, html {
+    overflow-x: hidden !important;
+}
+
+.mud-table-cell {
+    background-color: transparent !important;
+    color: #FFF !important;
+    border-color: #515D7A !important;
+}
+
+.mud-table-row, .mud-table-pagination-toolbar {
+    background-color: #333b4d !important;
+    color: #FFF !important;
+}
+
+    .mud-table-row:hover {
+        background-color: #515D7A !important;
+        border-color: #515D7A !important;
+    }
+
+
+.poor {
+    color: #9d9d9d !important;
+}
+
+.common {
+    color: #FFFFFF !important;
+}
+
+.uncommon {
+    color: #1eff00 !important;
+}
+
+.rare {
+    color: #0070dd !important;
+}
+
+.epic {
+    color: #a335ee !important;
+}
+
+.on-hover:hover {
+    cursor: pointer !important;
+}
+
+.panel-active > .mud-expand-panel-header {
+    background: #333b4d !important;
+    color: #FFF !important;
+}
+
+.simple-panel-active {
+    background: #333b4d !important;
+    color: #FFF !important;
+    cursor: pointer !important;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    transition: margin ease 0.3s;
+}

@@ -1,4 +1,5 @@
 ﻿using AHSync.Worker.Shared.Interfaces;
+using AHSync.Worker.Shared.Queries;
 using Dapper;
 using Infrastructure.Core.Entities;
 using Infrastructure.Core.Interfaces;
@@ -14,12 +15,17 @@ namespace AHSync.Worker.Shared.Repositories
 {
     public class AuctionHouseRepository : CoreRepository<Auction>, IAuctionHouseRepository
     {
-        public string SQL_SELECT_REALM_AND_FACTION_QUERY = "SELECT AuctionId, [RealmName], [RealmFaction], [ItemName], [ItemId], [ItemRand], [ItemSeed], [Bid], [Buyout], [Quantity], [TimeLeft], CreateAt, CreateBy, UpdateAt, UpdateBy FROM Auction WHERE RealmName = @RealmName AND RealmFaction = @RealmFaction AND DeleteAt IS NULL;";
+        public string SQL_SELECT_REALM_AND_FACTION_QUERY = "SELECT AuctionId, [RealmName], [RealmFaction], [ItemName], [ItemId], [ItemRand], [ItemSeed], [Bid], [Buyout], [Quantity], [TimeLeft], [Level], InventoryType, CreateAt, CreateBy, UpdateAt, UpdateBy FROM Auction WHERE RealmName = @RealmName AND RealmFaction = @RealmFaction AND DeleteAt IS NULL;";
         public string SQL_SELECT_ONE_BY_ID = "SELECT TOP(1) * FROM Auction WHERE AuctionId = @AuctionId;";
-        public string SQL_INSERT_QUERY = "INSERT INTO Auction(AuctionId, RealmName, RealmFaction, ItemName, ItemId, ItemRand, ItemSeed, Bid, Buyout, Quantity, TimeLeft, CreateAt, CreateBy) " +
-                                            "VALUES(@AuctionId, @RealmName, @RealmFaction, @ItemName, @ItemId, @ItemRand, @ItemSeed, @Bid, @Buyout, @Quantity, @TimeLeft, @CreateAt, @CreateBy);";
+        public string SQL_INSERT_QUERY = "INSERT INTO Auction(AuctionId, RealmName, RealmFaction, ItemName, ItemNameFr, ItemClass, ItemSubclass, ItemId, ItemRand, ItemSeed, Bid, Buyout, Quantity, TimeLeft, [Level], [InventoryType], CreateAt, CreateBy) " +
+                                            "VALUES(@AuctionId, @RealmName, @RealmFaction, @ItemName, @ItemNameFr, @ItemClass, @ItemSubclass, @ItemId, @ItemRand, @ItemSeed, @Bid, @Buyout, @Quantity, @TimeLeft, @Level, @InventoryType, @CreateAt, @CreateBy);";
         public string SQL_UPDATE_QUERY = "UPDATE Auction SET Bid = @Bid, Buyout = @Buyout, Quantity = @Quantity, TimeLeft = @TimeLeft, UpdateAt = @UpdateAt, UpdateBy = @UpdateBy WHERE AuctionId = @AuctionId;";
         public string SQL_DELETE_QUERY = "UPDATE Auction SET DeleteAt = @DeleteAt, DeleteBy = @DeleteBy WHERE AuctionId = @AuctionId;";
+
+        public string SQL_SELECT_FILTER_QUERY = "SELECT TOP 500 AuctionId, [RealmName], [RealmFaction], [ItemName], [ItemId], [ItemRand], [ItemSeed], " +
+                                                    "ItemNameFr, ItemClass, ItemSubclass, [Bid], [Buyout], [Quantity], [TimeLeft], [Level], InventoryType, Quality FROM Auction " +
+                                                    "WHERE (RealmName = @RealmName AND RealmFaction = @RealmFaction AND DeleteAt IS NULL) ";
+
 
         public AuctionHouseRepository(IDatabaseConnectionFactory connectionFactory, ILogger<CoreRepository<Auction>> logger)
             : base(connectionFactory, logger)
@@ -55,6 +61,53 @@ namespace AHSync.Worker.Shared.Repositories
             var connection = connectionFactory.GetConnection();
 
             using (var multi = connection.QueryMultiple(SQL_SELECT_REALM_AND_FACTION_QUERY, query))
+            {
+                return await multi.ReadAsync<Auction>();
+            }
+        }
+
+        private string GenerateSqlQuery(AuctionHouseQuery query)
+        {
+            string sql = "";
+
+            if (!string.IsNullOrEmpty(query.ItemName))
+            {
+                sql += "ItemName LIKE CONCAT('%', @ItemName, '%') ";
+            }
+
+            if (!string.IsNullOrEmpty(query.ItemNameFr))
+            {
+                sql += "ItemNameFr LIKE CONCAT('%', @ItemNameFr, '%') ";
+            }
+
+            if (!string.IsNullOrEmpty(query.Quality) && query.Quality != "All")
+            {
+                if (!string.IsNullOrEmpty(sql))
+                    sql += "AND ";
+
+                sql += "Quality LIKE CONCAT('%', @Quality, '%') ";
+            }
+
+
+            if (!string.IsNullOrEmpty(sql))
+                sql += "AND ";
+            sql += "([Level] >= @MinLevel AND [Level] <= @MaxLevel) ";
+
+
+            if (string.IsNullOrEmpty(sql))
+                return SQL_SELECT_FILTER_QUERY;
+
+            return SQL_SELECT_FILTER_QUERY + $" AND ({sql});";
+        }
+
+        public async Task<IEnumerable<Auction>> QueryFilterAsync(AuctionHouseQuery query)
+        {
+            var connection = connectionFactory.GetConnection();
+
+            var sqlStringQuery = GenerateSqlQuery(query);
+            logger.LogInformation($"QUERY => {sqlStringQuery}");
+
+            using (var multi = connection.QueryMultiple(GenerateSqlQuery(query), query))
             {
                 return await multi.ReadAsync<Auction>();
             }

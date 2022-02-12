@@ -1,4 +1,5 @@
-﻿using Infrastructure.Core.Entities;
+﻿using AHSync.Worker.Shared.Queries;
+using Infrastructure.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace AHSync.Worker.Shared.Interfaces
         Task<Guid?> InsertAsync(Auction entity);
         Task<int> InsertsAsync(Auction[] entities);
         Task<IEnumerable<Auction>> QueryMultipleAsync(Auction query);
+        Task<IEnumerable<Auction>> QueryFilterAsync(AuctionHouseQuery query);
         Task<IEnumerable<Auction>> QueryMultipleByIdAsync(Guid[] ids);
         Task<Auction> QueryOneAsync(Auction query);
         Task<Auction> QueryOneByIdAsync(Guid id);

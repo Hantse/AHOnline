@@ -1,0 +1,110 @@
+﻿<section class="section" id="pricing">
+    <div class="container">
+
+        <div class="row text-center">
+            <div class="col-sm-12">
+                <h2 class="title">Pricing</h2>
+                <p class="slogan">Stay free for basic feature, or subscribe for advance usage.</p>
+                <MudSwitch @bind-Checked="@IsAnnual" Label="Annualy" Color="Color.Info" />
+            </div>
+        </div
+        @if(IsAnnual){
+            <div class="row pt80">
+                <div class="col-lg-10 offset-lg-1">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="price_card text-center">
+                                <div class="header bg-info">
+                                    <span class="price">Free</span>
+                                    <span class="name">Free Pack</span>
+                                </div>
+                                <ul class="price-features">
+                                    <li>3 alerts</li>
+                                    <li>~30 minutes accuracy</li>
+                                </ul>
+                            </div>
+                    </div>
+
+                    <div class="col-sm-4">
+                            <div class="price_card text-center">
+                                <div class="header bg-pink">
+                                    <span class="price">10€</span>
+                                    <span class="name">Premium Pack</span>
+                                </div>
+                                <ul class="price-features">
+                                    <li>15 alerts</li>
+                                    <li>~15 minutes accuracy</li>
+                                </ul>
+                                <PricingButton PriceId="price_1KRZQEEexqdz4HCkMNH37Edm" />
+                            </div>
+                            <span class="tip">* Most popular!</span>
+                        </div>
+                    <div class="col-sm-4">
+                            <div class="price_card text-center">
+                                <div class="header bg-purple">
+                                    <span class="price">18€</span>
+                                    <span class="name">Ultimate Pack</span>
+                                </div>
+                                <ul class="price-features">
+                                    <li>100 alerts</li>
+                                    <li>~5 minutes accuracy</li>
+                                </ul>
+                                <PricingButton PriceId="price_1KRZRmEexqdz4HCkwwUXo22c" />
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+        else
+        {
+            <div class="row pt80">
+                <div class="col-lg-10 offset-lg-1">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="price_card text-center">
+                                <div class="header bg-info">
+                                    <span class="price">Free</span>
+                                    <span class="name">Free Pack</span>
+                                </div>
+                                <ul class="price-features">
+                                    <li>3 alerts</li>
+                                    <li>~30 minutes accuracy</li>
+                                </ul>
+                            </div>
+                    </div>
+
+                    <div class="col-sm-4">
+                            <div class="price_card text-center">
+                                <div class="header bg-pink">
+                                    <span class="price">1€</span>
+                                    <span class="name">Premium Pack</span>
+                                </div>
+                                <ul class="price-features">
+                                    <li>15 alerts</li>
+                                    <li>~15 minutes accuracy</li>
+                                </ul>
+                                <PricingButton PriceId="price_1KRZQEEexqdz4HCkUWso8D2n" />
+                            </div>
+                            <span class="tip">* Most popular!</span>
+                        </div>
+
+                    <div class="col-sm-4">
+                            <div class="price_card text-center">
+                                <div class="header bg-purple">
+                                    <span class="price">2€</span>
+                                    <span class="name">Ultimate Pack</span>
+                                </div>
+                                <ul class="price-features">
+                                    <li>100 alerts</li>
+                                    <li>~5 minutes accuracy</li>
+                                </ul>
+                                <PricingButton PriceId="price_1KRZRmEexqdz4HCk6N0P3kbg" />
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+</section>

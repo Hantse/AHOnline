@@ -1,0 +1,123 @@
+﻿<MudCardContent>
+    <EditForm Model="@formQueryModel">
+        <MudGrid>
+            <MudItem xs="3">
+                <MudTextField T="string" @bind-Value="formQueryModel.ItemName" Label="Search" Style="display:block" />
+            </MudItem>
+            <MudItem xs="1">
+                <MudTextField T="int" @bind-Value="formQueryModel.MinLevel" Label="Min level" Style="display:block" />
+            </MudItem>
+            <MudItem xs="1">
+                <MudTextField T="int" @bind-Value="formQueryModel.MaxLevel" Label="Max level" Style="display:block" />
+            </MudItem>
+            <MudItem xs="2">
+                <MudSelect T="string" @bind-Value="formQueryModel.Quality" Label="Quality" AnchorOrigin="Origin.BottomCenter">
+                    <MudSelectItem Value="@("All")" />
+                    <MudSelectItem Value="@("Poor")" />
+                    <MudSelectItem Value="@("Common")" />
+                    <MudSelectItem Value="@("Uncommon")" />
+                    <MudSelectItem Value="@("Rare")" />
+                    <MudSelectItem Value="@("Epic")" />
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="1">
+                <MudIconButton Style="margin-top:15px" Color="Color.Warning" aria-label="addalert" Icon="@Icons.Filled.Clear" OnClick="ClearAndReloadAsync" />
+            </MudItem>
+            <MudItem xs="3"></MudItem>
+            <MudItem xs="1">
+                <MudButton Style="margin-top:15px" ButtonType="ButtonType.Submit" Variant="Variant.Filled" OnClick="ReloadDataAsync" Color="Color.Primary">Search</MudButton>
+            </MudItem>
+        </MudGrid>
+    </EditForm>
+    <MudGrid Style="margin-top:30px;">
+        <MudItem xs="3">
+            <CategoryTree OnSelectCategory="SetCategory" OnSelectSubCategory="SetSubCategory" />
+        </MudItem>
+        <MudItem xs="9">
+            <MudTable @ref="table" Virtualize="true" FixedHeader="true"
+                      Loading="isLoading" Style="width:100%" T="ItemDisplay"
+                      ServerData="@(new Func<TableState, Task<TableData<ItemDisplay>>>(ServerReload))" Hover="true" Breakpoint="Breakpoint.Sm"
+                      LoadingProgressColor="Color.Info">
+                <HeaderContent>
+                    <MudTh></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="name" T="ItemDisplay">Name</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="quantity" T="ItemDisplay">Quantity</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="level" T="ItemDisplay">Level</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="timeleft" T="ItemDisplay">TimeLeft</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="bid" T="ItemDisplay">Bid</MudTableSortLabel></MudTh>
+                    <AuthorizeView>
+                        <Authorized Context="auth_context">
+                            <MudTh></MudTh>
+                        </Authorized>
+                    </AuthorizeView>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd Style="width:60px;">
+                        @if (context.Quantity > 1)
+                        {
+                            <MudBadge Origin="Origin.BottomLeft" Content="@context.Quantity" Color="Color.Dark" po Overlap="true">
+                                <a target="_blank" href="@($"https://tbc.wowhead.com/item={context.ItemId}")">
+                                    <img src="@($"img/items/item_{context.ItemId}.png")" width="32" height="32" />
+                                </a>
+                            </MudBadge>
+                        }
+                        else
+                        {
+                            <a target="_blank" href="@($"https://tbc.wowhead.com/item={context.ItemId}")">
+                                <img src="@($"img/items/item_{context.ItemId}.png")" width="32" height="32" />
+                            </a>
+                        }
+                    </MudTd>
+                    <MudTd DataLabel="Name">
+                        <a target="_blank" class="@GetQualityColor(context.Quality)" href="@($"https://tbc.wowhead.com/item={context.ItemId}")">
+                            <strong>@context.ItemName</strong>
+                        </a>
+                    </MudTd>
+                    <MudTd DataLabel="Quantity">
+                        @context.Quantity
+                    </MudTd>
+                    <MudTd DataLabel="Level">
+                        @if (context.Level > 0)
+                        {
+                            @context.Level
+                        }
+                    </MudTd>
+                    <MudTd DataLabel="Time"><TimeDisplay Value="@context.TimeLeft" /></MudTd>
+                    <MudTd DataLabel="Offer">
+                        <MoneyDisplay Value="@context.Bid" /><br />
+                        <MoneyDisplay Value="@context.Buyout" />
+                    </MudTd>
+                    <AuthorizeView>
+                        <Authorized Context="auth_context">
+                            <MudTd DataLabel="Action" Style="width:60px;">
+                                @*                                <MudButtonGroup>
+                                    <MudIconButton Style="color:#FFF !important;" aria-label="addalert" Icon="@Icons.Filled.AddAlert" />
+                                    <MudIconButton Style="color:#FFF !important;" aria-label="addalert" Icon="@Icons.Filled.AreaChart" />
+                                    </MudButtonGroup>*@
+                                <MudIconButton Style="color:#FFF !important;" OnClick="@(async () => await AddAlert(context.ItemId))" aria-label="addalert" Icon="@Icons.Filled.AddAlert" />
+                            </MudTd>
+                        </Authorized>
+                    </AuthorizeView>
+                </RowTemplate>
+                <NoRecordsContent>
+                    <MudText>
+                        @if (isLoading)
+                        {
+                            <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+                        }
+                        else
+                        {
+                            <MudText>Nothing found ...</MudText>
+                        }
+                    </MudText>
+                </NoRecordsContent>
+                <LoadingContent>
+                    <MudText><MudProgressCircular Color="Color.Default" Indeterminate="true" /></MudText>
+                </LoadingContent>
+                <PagerContent>
+                    <MudTablePager HideRowsPerPage="true" />
+                </PagerContent>
+            </MudTable>
+        </MudItem>
+    </MudGrid>
+</MudCardContent>

@@ -17,7 +17,7 @@ namespace Infrastructure.Core.Persistence
 
         public IDbConnection GetConnection()
         {
-            return sqlConnection;
+            return new SqlConnection(Environment.GetEnvironmentVariable("Database"));
         }
     }
 }

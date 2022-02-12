@@ -1,4 +1,6 @@
-﻿using AHSync.Worker.Shared.Filters;
+﻿using AHSync.Item.Worker.Shared.Interfaces;
+using AHSync.Item.Worker.Shared.Services;
+using AHSync.Worker.Shared.Filters;
 using AHSync.Worker.Shared.Interfaces;
 using AHSync.Worker.Shared.Repositories;
 using AHSync.Worker.Shared.Services;
@@ -35,9 +37,11 @@ namespace AHSync.Worker
             var builder = new ContainerBuilder();
             builder.RegisterType<SqlDbConnectionFactory>().As<IDatabaseConnectionFactory>().InstancePerDependency();
             builder.RegisterType<AuctionHouseRepository>().As<IAuctionHouseRepository>().InstancePerDependency();
+            builder.RegisterType<ItemRepository>().As<IItemRepository>().InstancePerDependency();
             builder.RegisterType<OperationHistoryRepository>().As<IOperationHistoryRepository>().InstancePerDependency();
             builder.RegisterType<WoWApiService>().As<IWoWApiService>().InstancePerDependency();
             builder.RegisterType<AuctionHouseService>().As<IAuctionHouseService>().InstancePerDependency();
+            builder.RegisterType<ItemSyncService>().As<IItemSyncService>().InstancePerDependency();
             builder.Populate(services);
 
             var options = new BackgroundJobServerOptions

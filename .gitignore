@@ -348,3 +348,9 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+/.logs
+/.tye
+/src/workers/AHSync.Item.Worker/Items
+/src/workers/AHSync.Item.Worker/Medias
+/src/workers/AHSync.Worker/Items
+/src/apps/FrontendApp/Items

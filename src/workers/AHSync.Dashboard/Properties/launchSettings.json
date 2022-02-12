@@ -13,10 +13,10 @@
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "Database": "Server=tcp:db.epic-wow.online,1433;Initial Catalog=AH_ONLINE_DEV;Persist Security Info=False;User ID=sa;Password=xxQb6FVes;MultipleActiveResultSets=True;Connection Timeout=30;",
-        "Database_Hangfire": "Server=tcp:db.epic-wow.online,1433;Initial Catalog=AH_SYNC_DATABASE;Persist Security Info=False;User ID=sa;Password=xxQb6FVes;MultipleActiveResultSets=True;Connection Timeout=30;"
+        "Database": "Server=tcp:51.178.185.60,1433;Initial Catalog=AH_ONLINE_DEV;Persist Security Info=False;User ID=sa;Password=xxQb6FVes;MultipleActiveResultSets=True;Connection Timeout=30;",
+        "Database_Hangfire": "Server=tcp:51.178.185.60,1433;Initial Catalog=AH_SYNC_DATABASE;Persist Security Info=False;User ID=sa;Password=xxQb6FVes;MultipleActiveResultSets=True;Connection Timeout=30;"
       },
-      "applicationUrl": "https://localhost:5001;http://localhost:5000",
+      "applicationUrl": "https://localhost:5003;http://localhost:5002",
       "dotnetRunMessages": true
     },
     "IIS Express": {

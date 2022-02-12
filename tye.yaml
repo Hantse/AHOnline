@@ -1,0 +1,73 @@
+name: stack-dev
+
+# extensions:
+# - name: zipkin
+# - name: seq
+#   logPath: ./.logs
+
+network: ahonline-services
+namespace: ahonline-services
+
+services:
+- name: service-frontend
+  project: src/apps/FrontendApp/FrontendApp.csproj
+  bindings:
+  - port: 5010
+    name: http
+  - port: 5011
+    name: https
+    protocol: https   
+  env_file:
+  - ./global.env
+
+#- name: service-api
+#  project: src/services/Service.Api/Service.Api.csproj
+#  bindings:
+#  - port: 5000
+#    name: http
+#  - port: 5001
+#    name: https
+#    protocol: https   
+#  env_file:
+#  - ./global.env
+
+#- name: service-item
+#  image: "hantse/wgm-item-worker"
+#  env_file:
+#    - ./global.env
+#  volumes:
+#    - source: /data/items/
+#      target: /app/Medias/
+#  env:
+#    - ConnectionStrings:Default="Server=tcp:51.178.185.60,1433;Initial Catalog=DBNAME#;Persist Security Info=False;User ID=sa;Password=xxQb6FVes;MultipleActiveResultSets=True;Connection Timeout=30;"
+#    - Database=AH_ONLINE_DEV
+
+#- name: hangfire-dashboard
+#  project: src/workers/AHSync.Dashboard/AHSync.Dashboard.csproj
+#  bindings:
+#  - port: 5002
+#    name: http
+#  - port: 5003
+#    name: https
+#    protocol: https 
+#  env_file:
+#  - ./global.env
+
+#- name: hangfire-worker-auction
+#  project: src/workers/AHSync.Worker/AHSync.Worker.csproj
+#  replicas: 4 
+#  env_file:
+#  - ./global.env
+#  env:
+#  - QueueName=default
+
+#- name: hangfire-worker-item
+#  project: src/workers/AHSync.Item.Worker/AHSync.Item.Worker.csproj
+#  replicas: 4 
+#  volumes:
+#  - source: data/items
+#    target: /Items
+#  env_file:
+#  - ./global.env
+#  env:
+#  - QueueName=item-sync  

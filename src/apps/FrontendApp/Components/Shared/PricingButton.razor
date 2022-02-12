@@ -1,0 +1,8 @@
+﻿<AuthorizeView>
+    <Authorized>
+        <button @onclick="@(async () => await GetUriAsync())" class="btn btn-info w-md">Subscribe</button>
+    </Authorized>
+    <NotAuthorized>
+        <a href="Account/Login" class="btn btn-info w-md">Sign in</a>
+    </NotAuthorized>
+</AuthorizeView>

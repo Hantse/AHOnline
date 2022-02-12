@@ -1,0 +1,20 @@
+﻿@GetTime()
+
+@code {
+    [Parameter]
+    public string Value { get; set; }
+
+    public string GetTime()
+    {
+        if (Value == "VERY_LONG")
+            return "48h";
+
+        if (Value == "LONG")
+            return "24h";
+
+        if (Value == "MEDIUM")
+            return "12h";
+
+        return "2h";
+    }
+}

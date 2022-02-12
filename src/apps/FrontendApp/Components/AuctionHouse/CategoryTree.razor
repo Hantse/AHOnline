@@ -1,0 +1,89 @@
+﻿@using FrontendApp.Datas
+@if (selectedCategory != null && selectedCategory != "")
+{
+    <MudBreadcrumbs Items="items" Separator=">"></MudBreadcrumbs>
+}
+else
+{
+    <div style="height:56px !important; display:block;width:100%;" />
+}
+
+<MudExpansionPanels>
+    @foreach (var category in categories)
+    {
+        @if (category.SubCategories != null && category.SubCategories.Any() && category.SubCategories.Count > 0)
+        {
+            <MudExpansionPanel Class="@IsActive(category.Key)" Text="@category.Key" @onclick="@(async () => await SetCategory(category.Key))">
+                @if (category.SubCategories != null && category.SubCategories.Any() && category.SubCategories.Count > 0)
+                {
+                    <MudList Clickable="true">
+                        @foreach (var child in category.SubCategories)
+                        {
+                            <MudListItem Text="@child.Key" OnClick="@(async () => await SetSubCategory(child.Key))" />
+                        }
+                    </MudList>
+                }
+            </MudExpansionPanel>
+        }
+        else
+        {
+            <MudCard Class="@IsSimpleActive(category.Key)" Style="border-radius:0px; border-bottom:1px #0000001e solid;" @onclick="@(() => SetCategory(category.Key))" Elevation="1">
+                <MudCardContent>
+                    @category.Key
+                </MudCardContent>
+            </MudCard>
+        }
+    }
+</MudExpansionPanels>
+
+@code {
+
+    [Parameter]
+    public EventCallback<string> OnSelectCategory { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnSelectSubCategory { get; set; }
+
+    private List<CategoryModel> categories = AuctionHouseData.Categories;
+    private List<BreadcrumbItem> items = new List<BreadcrumbItem>();
+
+    private string selectedCategory = string.Empty;
+    private string selectedSubCategory = string.Empty;
+
+    public string IsActive(string category)
+    {
+        return selectedCategory == category ? $"panel-active" : "";
+    }
+
+    public string IsSimpleActive(string category)
+    {
+        return selectedCategory == category ? $"simple-panel-active on-hover" : "on-hover";
+    }
+
+
+    private async Task SetCategory(string category)
+    {
+        if (category == selectedCategory)
+        {
+            selectedCategory = string.Empty;
+        }
+        else
+            selectedCategory = category;
+
+        selectedSubCategory = string.Empty;
+
+        await OnSelectCategory.InvokeAsync(category);
+        items = new List<BreadcrumbItem>() { new BreadcrumbItem(selectedCategory, ""), new BreadcrumbItem(selectedSubCategory, "") };
+    }
+
+    private async Task SetSubCategory(string subCategory)
+    {
+        if (subCategory == selectedSubCategory)
+            selectedSubCategory = string.Empty;
+        else
+            selectedSubCategory = subCategory;
+
+        await OnSelectSubCategory.InvokeAsync(subCategory);
+        items = new List<BreadcrumbItem>() { new BreadcrumbItem(selectedCategory, ""), new BreadcrumbItem(selectedSubCategory, "") };
+    }
+}

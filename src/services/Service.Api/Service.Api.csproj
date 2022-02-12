@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>cdd1d941-6e84-4bdd-8568-b5bb5083cea8</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..\..</DockerfileContext>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CassandraCSharpDriver" Version="3.16.3" />
+    <PackageReference Include="Elasticsearch.Net" Version="7.14.1" />
+    <PackageReference Include="IA.Infrastructure.Core" Version="1.1.0-CI-20210808-153541" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.11.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\shared\AHSync.Worker.Shared\AHSync.Worker.Shared.csproj" />
+    <ProjectReference Include="..\..\shared\Infrastructure.Core\Infrastructure.Core.csproj" />
+  </ItemGroup>
+
+</Project>

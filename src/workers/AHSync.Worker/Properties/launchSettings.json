@@ -3,8 +3,8 @@
     "AHSync.Worker": {
       "commandName": "Project",
       "environmentVariables": {
-        "Database": "Server=tcp:db.epic-wow.online,1433;Initial Catalog=AH_ONLINE_DEV;Persist Security Info=False;User ID=sa;Password=xxQb6FVes;MultipleActiveResultSets=True;Connection Timeout=30;",
-        "Database_Hangfire": "Server=tcp:db.epic-wow.online,1433;Initial Catalog=AH_SYNC_DATABASE;Persist Security Info=False;User ID=sa;Password=xxQb6FVes;MultipleActiveResultSets=True;Connection Timeout=30;"
+        "Database": "Server=tcp:localhost,1433;Initial Catalog=AH_ONLINE_DEV;Persist Security Info=False;User ID=sa;Password=xxQb6FVes;MultipleActiveResultSets=True;Connection Timeout=30;",
+        "Database_Hangfire": "Server=tcp:localhost,1433;Initial Catalog=AH_SYNC_DATABASE;Persist Security Info=False;User ID=sa;Password=xxQb6FVes;MultipleActiveResultSets=True;Connection Timeout=30;"
       }
     },
     "Docker": {

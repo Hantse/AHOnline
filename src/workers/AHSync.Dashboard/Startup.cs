@@ -1,3 +1,4 @@
+using AHSync.Item.Worker.Shared.Interfaces;
 using AHSync.Worker.Shared.Interfaces;
 using AHSync.Worker.Shared.Repositories;
 using AHSync.Worker.Shared.Services;
@@ -15,7 +16,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AHSync.Dashboard
@@ -75,7 +75,7 @@ namespace AHSync.Dashboard
 
             app.UseHttpsRedirection();
 
-            InitJobs();
+            InitJobs().Wait();
         }
 
         public async Task InitJobs()
@@ -92,8 +92,12 @@ namespace AHSync.Dashboard
                 var realmInformations = await clientWow.GetConnectedRealmAsync(realmId);
                 var realmName = realmInformations.RealmDetails[0].Name;
 
-                RecurringJob.AddOrUpdate<IAuctionHouseService>($"{realmName}-ally", (auctionHouseService) => auctionHouseService.TryProcessAsync(realmId, realmName, 2), "*/30 * * * *", TimeZoneInfo.Utc);
-                RecurringJob.AddOrUpdate<IAuctionHouseService>($"{realmName}-horde", (auctionHouseService) => auctionHouseService.TryProcessAsync(realmId, realmName, 6), "*/30 * * * *", TimeZoneInfo.Utc);
+                if (realmName.Contains("Sulfuron"))
+                {
+                    RecurringJob.AddOrUpdate<IAuctionHouseService>($"{realmName}-ally", (auctionHouseService) => auctionHouseService.TryProcessAsync(realmId, realmName, 2), "*/10 * * * *", TimeZoneInfo.Utc);
+                    RecurringJob.AddOrUpdate<IAuctionHouseService>($"{realmName}-horde", (auctionHouseService) => auctionHouseService.TryProcessAsync(realmId, realmName, 6), "*/10 * * * *", TimeZoneInfo.Utc);
+                    RecurringJob.AddOrUpdate<IAuctionHouseService>($"{realmName}-shared", (auctionHouseService) => auctionHouseService.TryProcessAsync(realmId, realmName, 7), "*/10 * * * *", TimeZoneInfo.Utc);
+                }
             }
         }
     }
